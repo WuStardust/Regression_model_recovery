@@ -1,32 +1,37 @@
-I = imread('station.png');
-figure,imshow(I);
-[m,n] = size(I);
-
-F = fft2(I);
+%%
+%¶ÁÈ¡Í¼Ïñ
+close all;
+clear all;
+filename = 'motion_blur.jpg';
+I = imread(filename);
 figure
-imshow(uint8(F));
-%% å°†é¢‘è°±å‹ç¼©ï¼Œå±…ä¸­
+imshow(uint8(I));
+title('Ô­Í¼');
+%%
+%Ä£ºı¾àÀë
+h=fspecial('sobel');
+img_double=double(I);
+J=conv2(img_double,h,'same');
+IP=abs(fft2(J));
+S=fftshift(real(ifft2(IP)));
+figure
+plot(S);
+%%
+%Ä£ºı½Ç¶È
+F = fft2(I);
 H = log(1+abs(F));
 Hc = fftshift(H);
-figure
-imshow(uint8(Hc)); 
-%% ç”¨cannyç®—å­å°†å‹ç¼©å±…ä¸­åçš„é¢‘è°±å›¾è¿›è¡Œè¾¹ç¼˜æ£€æµ‹ï¼ŒäºŒå€¼åŒ–
 T = graythresh(Hc);
 bw=edge(Hc, 'canny', T);
-figure
-imshow(bw);
-%% å¯¹äºŒå€¼åŒ–åçš„é¢‘è°±å›¾è¿›è¡Œradonå˜æ¢
 theta = 1:180;
 R = radon(bw, theta);
-figure
-imshow(R);
-%% è®¡ç®—å‡ºé€šè¿‡radonå˜æ¢æ±‚å‡ºçš„æ¨¡ç³Šè§’åº¦
 MAX = max(max(R));
 [m, n] = find(R == MAX);
 [M,N] = size(Hc);
 beita = atan(tan(n*pi/180)*M/N)*180/pi;
-
-PSF = fspecial('motion',16,12);
-fr2= deconvwnr(I,PSF);
+%%
+%Î¬ÄÉÂË²¨
+PSF = fspecial('motion',16,beita);%Ä£ºı¾àÀëĞèÒªÓÉÄ£ºı¾àÀë¶Î´úÂë¿´Í¼µÃ³ö
+I0= deconvwnr(I,PSF,0.005);%ĞÅÔë±ÈĞèÒª³¢ÊÔ
 figure
-imshow(fr2);
+imshow(IO);
